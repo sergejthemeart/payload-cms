@@ -2,6 +2,8 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
+import { de } from '@payloadcms/translations/languages/de'
+import { en } from '@payloadcms/translations/languages/en'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
@@ -19,10 +21,11 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  i18n: {
+    fallbackLanguage: 'en',
+    supportedLanguages: { en, de },
+  },
   admin: {
-    language: {
-      defaultLanguage: 'de',
-    },
     components: {
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
@@ -30,10 +33,8 @@ export default buildConfig({
       // The `BeforeDashboard` component renders the 'welcome' block that you see after logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeDashboard: ['@/components/BeforeDashboard'],
-    },
     importMap: {
       baseDir: path.resolve(dirname),
-    },
     user: Users.slug,
     livePreview: {
       breakpoints: [
@@ -56,14 +57,12 @@ export default buildConfig({
           height: 900,
         },
       ],
-    },
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
-    },
   }),
   collections: [Pages, Posts, Media, Categories, Users],
   cors: [getServerSideURL()].filter(Boolean),
@@ -89,7 +88,6 @@ export default buildConfig({
         const authHeader = req.headers.get('authorization')
         return authHeader === `Bearer ${secret}`
       },
-    },
     tasks: [],
   },
 })
